@@ -292,6 +292,17 @@ export function ScenarioPlanner() {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-gray-50 border-t border-gray-200 mt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <div className="text-sm text-gray-600">
+              💻 Developed with ❤️ by <span className="font-medium text-gray-900">Vincenzo Rosa</span>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 } 

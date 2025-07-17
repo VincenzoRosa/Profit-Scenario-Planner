@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { OriginalMetrics } from '@/lib/scenarioCalculations';
+import { OriginalMetrics, ChannelMetrics, sumChannels } from '@/lib/scenarioCalculations';
 
 interface DataInputPanelProps {
   originalData: OriginalMetrics;
@@ -14,11 +14,35 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
   const [localData, setLocalData] = useState<OriginalMetrics>(originalData);
   const [isEditing, setIsEditing] = useState(false);
 
-  const handleInputChange = (field: keyof OriginalMetrics, value: string) => {
+  // Helper function for safe division
+  const safeDivide = (numerator: number, denominator: number, fallback: number = 0) => {
+    return denominator !== 0 ? numerator / denominator : fallback;
+  };
+
+  const handleInputChange = (field: keyof OriginalMetrics, value: string | ChannelMetrics) => {
+    if (typeof value === 'string') {
+      const numValue = parseFloat(value) || 0;
+      setLocalData(prev => ({
+        ...prev,
+        [field]: numValue
+      }));
+    } else {
+      // Handle ChannelMetrics
+      setLocalData(prev => ({
+        ...prev,
+        [field]: value
+      }));
+    }
+  };
+
+  const handleChannelChange = (field: 'revenue' | 'spend' | 'orders' | 'aov', channel: keyof ChannelMetrics, value: string) => {
     const numValue = parseFloat(value) || 0;
     setLocalData(prev => ({
       ...prev,
-      [field]: numValue
+      [field]: {
+        ...prev[field],
+        [channel]: numValue
+      }
     }));
   };
 
@@ -34,13 +58,12 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
 
   const handleReset = () => {
     const defaultData: OriginalMetrics = {
-      revenue: 4000000,
-      spend: 2000000,
-      orders: 100000,
-      aov: 40,
+      revenue: { paid: 2000000, organic: 800000, crm: 400000, socialPaid: 300000, tiktok: 200000, affiliate: 300000 },
+      spend: { paid: 1000000, organic: 200000, crm: 100000, socialPaid: 200000, tiktok: 150000, affiliate: 350000 },
+      orders: { paid: 50000, organic: 20000, crm: 10000, socialPaid: 8000, tiktok: 6000, affiliate: 6000 },
+      aov: { paid: 40, organic: 40, crm: 40, socialPaid: 37.5, tiktok: 33.33, affiliate: 50 },
       shippingCost: 100000,
-      cogsPercent: 12,
-      opex: 200000
+      cogsPercent: 12
     };
     setLocalData(defaultData);
     onDataChange(defaultData);
@@ -48,16 +71,42 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
   };
 
   const exportToCSV = () => {
+    const totalRevenue = sumChannels(originalData.revenue);
+    const totalSpend = sumChannels(originalData.spend);
+    
     const csvContent = [
       'Metric,Value',
-      `Revenue,${originalData.revenue}`,
-      `Marketing Spend,${originalData.spend}`,
-      `Orders,${originalData.orders}`,
-      `Average Order Value,${originalData.aov}`,
+      `Total Revenue,${totalRevenue}`,
+      `Total Marketing Spend,${totalSpend}`,
+      `Paid Revenue,${originalData.revenue.paid}`,
+      `Organic Revenue,${originalData.revenue.organic}`,
+      `CRM Revenue,${originalData.revenue.crm}`,
+      `Social Paid Revenue,${originalData.revenue.socialPaid}`,
+      `TikTok Revenue,${originalData.revenue.tiktok}`,
+      `Affiliate Revenue,${originalData.revenue.affiliate}`,
+      `Paid Spend,${originalData.spend.paid}`,
+      `Organic Spend,${originalData.spend.organic}`,
+      `CRM Spend,${originalData.spend.crm}`,
+      `Social Paid Spend,${originalData.spend.socialPaid}`,
+      `TikTok Spend,${originalData.spend.tiktok}`,
+      `Affiliate Spend,${originalData.spend.affiliate}`,
+      `Total Orders,${sumChannels(originalData.orders)}`,
+      `Total AOV,${sumChannels(originalData.aov) / 6}`,
+      `Paid Orders,${originalData.orders.paid}`,
+      `Organic Orders,${originalData.orders.organic}`,
+      `CRM Orders,${originalData.orders.crm}`,
+      `Social Paid Orders,${originalData.orders.socialPaid}`,
+      `TikTok Orders,${originalData.orders.tiktok}`,
+      `Affiliate Orders,${originalData.orders.affiliate}`,
+      `Paid AOV,${originalData.aov.paid}`,
+      `Organic AOV,${originalData.aov.organic}`,
+      `CRM AOV,${originalData.aov.crm}`,
+      `Social Paid AOV,${originalData.aov.socialPaid}`,
+      `TikTok AOV,${originalData.aov.tiktok}`,
+      `Affiliate AOV,${originalData.aov.affiliate}`,
       `Shipping Cost,${originalData.shippingCost}`,
       `COGS %,${originalData.cogsPercent}`,
-      `Operating Expenses,${originalData.opex}`,
-      `ROAS,${(originalData.revenue / originalData.spend).toFixed(2)}`
+      `ROAS,${safeDivide(totalRevenue, totalSpend, 0).toFixed(2)}`
     ].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -85,11 +134,71 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
         
         if (!isNaN(numValue)) {
           switch (metric.toLowerCase()) {
-            case 'revenue':
-              newData.revenue = numValue;
+            case 'total revenue':
+              // Distribute total revenue proportionally
+              const currentTotal = sumChannels(newData.revenue);
+              if (currentTotal > 0) {
+                const ratio = numValue / currentTotal;
+                newData.revenue = {
+                  paid: newData.revenue.paid * ratio,
+                  organic: newData.revenue.organic * ratio,
+                  crm: newData.revenue.crm * ratio,
+                  socialPaid: newData.revenue.socialPaid * ratio,
+                  tiktok: newData.revenue.tiktok * ratio,
+                  affiliate: newData.revenue.affiliate * ratio
+                };
+              }
               break;
-            case 'marketing spend':
-              newData.spend = numValue;
+            case 'total marketing spend':
+              // Distribute total spend proportionally
+              const currentSpendTotal = sumChannels(newData.spend);
+              if (currentSpendTotal > 0) {
+                const spendRatio = numValue / currentSpendTotal;
+                newData.spend = {
+                  paid: newData.spend.paid * spendRatio,
+                  organic: newData.spend.organic * spendRatio,
+                  crm: newData.spend.crm * spendRatio,
+                  socialPaid: newData.spend.socialPaid * spendRatio,
+                  tiktok: newData.spend.tiktok * spendRatio,
+                  affiliate: newData.spend.affiliate * spendRatio
+                };
+              }
+              break;
+            case 'paid revenue':
+              newData.revenue.paid = numValue;
+              break;
+            case 'organic revenue':
+              newData.revenue.organic = numValue;
+              break;
+            case 'crm revenue':
+              newData.revenue.crm = numValue;
+              break;
+            case 'social paid revenue':
+              newData.revenue.socialPaid = numValue;
+              break;
+            case 'tiktok revenue':
+              newData.revenue.tiktok = numValue;
+              break;
+            case 'affiliate revenue':
+              newData.revenue.affiliate = numValue;
+              break;
+            case 'paid spend':
+              newData.spend.paid = numValue;
+              break;
+            case 'organic spend':
+              newData.spend.organic = numValue;
+              break;
+            case 'crm spend':
+              newData.spend.crm = numValue;
+              break;
+            case 'social paid spend':
+              newData.spend.socialPaid = numValue;
+              break;
+            case 'tiktok spend':
+              newData.spend.tiktok = numValue;
+              break;
+            case 'affiliate spend':
+              newData.spend.affiliate = numValue;
               break;
             case 'orders':
               newData.orders = numValue;
@@ -128,6 +237,9 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
   const formatNumber = (value: number) => {
     return new Intl.NumberFormat('en-US').format(value);
   };
+
+  const totalRevenue = sumChannels(originalData.revenue);
+  const totalSpend = sumChannels(originalData.spend);
 
   return (
     <div className={`border-b border-gray-200 ${isEditing ? 'bg-blue-50' : 'bg-white'}`}>
@@ -172,140 +284,357 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
         </div>
 
         {isOpen && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Revenue */}
-            <div className="space-y-2">
-              <label className="block text-xs font-medium text-gray-700">Revenue</label>
-              {isEditing ? (
-                <input
-                  type="number"
-                  value={localData.revenue}
-                  onChange={(e) => handleInputChange('revenue', e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="4000000"
-                />
-              ) : (
+          <div className="space-y-6">
+            {/* Summary Metrics */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <label className="block text-xs font-medium text-gray-700">Total Revenue</label>
                 <div className="px-3 py-2 text-sm bg-gray-50 rounded-md">
-                  {formatCurrency(originalData.revenue)}
+                  {formatCurrency(totalRevenue)}
                 </div>
-              )}
-            </div>
-
-            {/* Marketing Spend */}
-            <div className="space-y-2">
-              <label className="block text-xs font-medium text-gray-700">Marketing Spend</label>
-              {isEditing ? (
-                <input
-                  type="number"
-                  value={localData.spend}
-                  onChange={(e) => handleInputChange('spend', e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="2000000"
-                />
-              ) : (
-                <div className="px-3 py-2 text-sm bg-gray-50 rounded-md">
-                  {formatCurrency(originalData.spend)}
-                </div>
-              )}
-            </div>
-
-            {/* Orders */}
-            <div className="space-y-2">
-              <label className="block text-xs font-medium text-gray-700">Orders</label>
-              {isEditing ? (
-                <input
-                  type="number"
-                  value={localData.orders}
-                  onChange={(e) => handleInputChange('orders', e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="100000"
-                />
-              ) : (
-                <div className="px-3 py-2 text-sm bg-gray-50 rounded-md">
-                  {formatNumber(originalData.orders)}
-                </div>
-              )}
-            </div>
-
-            {/* Average Order Value */}
-            <div className="space-y-2">
-              <label className="block text-xs font-medium text-gray-700">AOV</label>
-              {isEditing ? (
-                <input
-                  type="number"
-                  value={localData.aov}
-                  onChange={(e) => handleInputChange('aov', e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="40"
-                />
-              ) : (
-                <div className="px-3 py-2 text-sm bg-gray-50 rounded-md">
-                  €{originalData.aov}
-                </div>
-              )}
-            </div>
-
-            {/* Shipping Cost */}
-            <div className="space-y-2">
-              <label className="block text-xs font-medium text-gray-700">Shipping Cost</label>
-              {isEditing ? (
-                <input
-                  type="number"
-                  value={localData.shippingCost}
-                  onChange={(e) => handleInputChange('shippingCost', e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="100000"
-                />
-              ) : (
-                <div className="px-3 py-2 text-sm bg-gray-50 rounded-md">
-                  {formatCurrency(originalData.shippingCost)}
-                </div>
-              )}
-            </div>
-
-            {/* COGS % */}
-            <div className="space-y-2">
-              <label className="block text-xs font-medium text-gray-700">COGS %</label>
-              {isEditing ? (
-                <input
-                  type="number"
-                  value={localData.cogsPercent}
-                  onChange={(e) => handleInputChange('cogsPercent', e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="12"
-                  step="0.1"
-                />
-              ) : (
-                <div className="px-3 py-2 text-sm bg-gray-50 rounded-md">
-                  {originalData.cogsPercent}%
-                </div>
-              )}
-            </div>
-
-            {/* Operating Expenses */}
-            <div className="space-y-2">
-              <label className="block text-xs font-medium text-gray-700">Operating Expenses</label>
-              {isEditing ? (
-                <input
-                  type="number"
-                  value={localData.opex}
-                  onChange={(e) => handleInputChange('opex', e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="200000"
-                />
-              ) : (
-                <div className="px-3 py-2 text-sm bg-gray-50 rounded-md">
-                  {formatCurrency(originalData.opex)}
-                </div>
-              )}
-            </div>
-
-            {/* Summary Stats */}
-            <div className="space-y-2">
-              <label className="block text-xs font-medium text-gray-700">Current ROAS</label>
-              <div className="px-3 py-2 text-sm bg-gray-50 rounded-md">
-                {(originalData.revenue / originalData.spend).toFixed(2)}
               </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs font-medium text-gray-700">Total Marketing Spend</label>
+                <div className="px-3 py-2 text-sm bg-gray-50 rounded-md">
+                  {formatCurrency(totalSpend)}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs font-medium text-gray-700">Current ROAS</label>
+                <div className="px-3 py-2 text-sm bg-gray-50 rounded-md">
+                  {safeDivide(totalRevenue, totalSpend, 0).toFixed(2)}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs font-medium text-gray-700">Marketing Cost %</label>
+                <div className="px-3 py-2 text-sm bg-gray-50 rounded-md">
+                  {(safeDivide(totalSpend, totalRevenue, 0) * 100).toFixed(2)}%
+                </div>
+              </div>
+            </div>
+
+            {/* Channel Breakdown */}
+            {isEditing && (
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium text-gray-900">Revenue by Channel</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">Paid</label>
+                    <input
+                      type="number"
+                      value={localData.revenue.paid}
+                      onChange={(e) => handleChannelChange('revenue', 'paid', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="2000000"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">Organic</label>
+                    <input
+                      type="number"
+                      value={localData.revenue.organic}
+                      onChange={(e) => handleChannelChange('revenue', 'organic', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="800000"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">CRM</label>
+                    <input
+                      type="number"
+                      value={localData.revenue.crm}
+                      onChange={(e) => handleChannelChange('revenue', 'crm', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="400000"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">Social Paid</label>
+                    <input
+                      type="number"
+                      value={localData.revenue.socialPaid}
+                      onChange={(e) => handleChannelChange('revenue', 'socialPaid', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="300000"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">TikTok</label>
+                    <input
+                      type="number"
+                      value={localData.revenue.tiktok}
+                      onChange={(e) => handleChannelChange('revenue', 'tiktok', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="200000"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">Affiliate</label>
+                    <input
+                      type="number"
+                      value={localData.revenue.affiliate}
+                      onChange={(e) => handleChannelChange('revenue', 'affiliate', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="300000"
+                    />
+                  </div>
+                </div>
+
+                <h4 className="text-sm font-medium text-gray-900">Marketing Spend by Channel</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">Paid</label>
+                    <input
+                      type="number"
+                      value={localData.spend.paid}
+                      onChange={(e) => handleChannelChange('spend', 'paid', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="1000000"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">Organic</label>
+                    <input
+                      type="number"
+                      value={localData.spend.organic}
+                      onChange={(e) => handleChannelChange('spend', 'organic', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="200000"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">CRM</label>
+                    <input
+                      type="number"
+                      value={localData.spend.crm}
+                      onChange={(e) => handleChannelChange('spend', 'crm', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="100000"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">Social Paid</label>
+                    <input
+                      type="number"
+                      value={localData.spend.socialPaid}
+                      onChange={(e) => handleChannelChange('spend', 'socialPaid', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="200000"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">TikTok</label>
+                    <input
+                      type="number"
+                      value={localData.spend.tiktok}
+                      onChange={(e) => handleChannelChange('spend', 'tiktok', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="150000"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">Affiliate</label>
+                    <input
+                      type="number"
+                      value={localData.spend.affiliate}
+                      onChange={(e) => handleChannelChange('spend', 'affiliate', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="350000"
+                    />
+                  </div>
+                </div>
+
+                <h4 className="text-sm font-medium text-gray-900">Orders by Channel</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">Paid</label>
+                    <input
+                      type="number"
+                      value={localData.orders.paid}
+                      onChange={(e) => handleChannelChange('orders', 'paid', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="50000"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">Organic</label>
+                    <input
+                      type="number"
+                      value={localData.orders.organic}
+                      onChange={(e) => handleChannelChange('orders', 'organic', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="20000"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">CRM</label>
+                    <input
+                      type="number"
+                      value={localData.orders.crm}
+                      onChange={(e) => handleChannelChange('orders', 'crm', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="10000"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">Social Paid</label>
+                    <input
+                      type="number"
+                      value={localData.orders.socialPaid}
+                      onChange={(e) => handleChannelChange('orders', 'socialPaid', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="8000"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">TikTok</label>
+                    <input
+                      type="number"
+                      value={localData.orders.tiktok}
+                      onChange={(e) => handleChannelChange('orders', 'tiktok', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="6000"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">Affiliate</label>
+                    <input
+                      type="number"
+                      value={localData.orders.affiliate}
+                      onChange={(e) => handleChannelChange('orders', 'affiliate', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="6000"
+                    />
+                  </div>
+                </div>
+
+                <h4 className="text-sm font-medium text-gray-900">Average Order Value by Channel</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">Paid</label>
+                    <input
+                      type="number"
+                      value={localData.aov.paid}
+                      onChange={(e) => handleChannelChange('aov', 'paid', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="40"
+                      step="0.01"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">Organic</label>
+                    <input
+                      type="number"
+                      value={localData.aov.organic}
+                      onChange={(e) => handleChannelChange('aov', 'organic', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="40"
+                      step="0.01"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">CRM</label>
+                    <input
+                      type="number"
+                      value={localData.aov.crm}
+                      onChange={(e) => handleChannelChange('aov', 'crm', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="40"
+                      step="0.01"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">Social Paid</label>
+                    <input
+                      type="number"
+                      value={localData.aov.socialPaid}
+                      onChange={(e) => handleChannelChange('aov', 'socialPaid', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="37.5"
+                      step="0.01"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">TikTok</label>
+                    <input
+                      type="number"
+                      value={localData.aov.tiktok}
+                      onChange={(e) => handleChannelChange('aov', 'tiktok', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="33.33"
+                      step="0.01"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-gray-700">Affiliate</label>
+                    <input
+                      type="number"
+                      value={localData.aov.affiliate}
+                      onChange={(e) => handleChannelChange('aov', 'affiliate', e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="50"
+                      step="0.01"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Other Metrics */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <label className="block text-xs font-medium text-gray-700">Total Orders</label>
+                <div className="px-3 py-2 text-sm bg-gray-50 rounded-md">
+                  {formatNumber(sumChannels(originalData.orders))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs font-medium text-gray-700">Average AOV</label>
+                <div className="px-3 py-2 text-sm bg-gray-50 rounded-md">
+                  €{(sumChannels(originalData.aov) / 6).toFixed(2)}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs font-medium text-gray-700">Shipping Cost</label>
+                {isEditing ? (
+                  <input
+                    type="number"
+                    value={localData.shippingCost}
+                    onChange={(e) => handleInputChange('shippingCost', e.target.value)}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="100000"
+                  />
+                ) : (
+                  <div className="px-3 py-2 text-sm bg-gray-50 rounded-md">
+                    {formatCurrency(originalData.shippingCost)}
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs font-medium text-gray-700">COGS %</label>
+                {isEditing ? (
+                  <input
+                    type="number"
+                    value={localData.cogsPercent}
+                    onChange={(e) => handleInputChange('cogsPercent', e.target.value)}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="12"
+                    step="0.1"
+                  />
+                ) : (
+                  <div className="px-3 py-2 text-sm bg-gray-50 rounded-md">
+                    {originalData.cogsPercent}%
+                  </div>
+                )}
+              </div>
+
+
             </div>
           </div>
         )}

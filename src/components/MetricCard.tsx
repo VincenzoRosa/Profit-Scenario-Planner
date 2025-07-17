@@ -20,9 +20,13 @@ export function MetricCard({
   const formatValue = (value: number, formatType: string) => {
     switch (formatType) {
       case 'currency':
+        // Remove decimals for Revenue and Net Profit cards
+        if (title.includes('Revenue') || title.includes('Net Profit')) {
+          return `€${Math.round(value).toLocaleString()}`;
+        }
         return `€${value.toLocaleString()}`;
       case 'percentage':
-        return `${value.toFixed(1)}%`;
+        return `${value.toFixed(2)}%`;
       case 'ratio':
         return value.toFixed(2);
       case 'number':
@@ -55,7 +59,7 @@ export function MetricCard({
     const percentChange = original !== 0 ? (change / original) * 100 : 0;
     
     if (Math.abs(percentChange) < 2) return 'No change';
-    return `${change > 0 ? '+' : ''}${percentChange.toFixed(1)}%`;
+    return `${change > 0 ? '+' : ''}${percentChange.toFixed(2)}%`;
   };
 
   const renderSideBySide = () => (

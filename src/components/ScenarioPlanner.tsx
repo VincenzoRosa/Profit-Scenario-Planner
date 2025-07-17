@@ -3,47 +3,36 @@
 import { useState } from 'react';
 import { MetricSlider } from './MetricSlider';
 import { MetricCard } from './MetricCard';
+import { ChannelSlider } from './ChannelSlider';
 import { ScenarioPresets } from './ScenarioPresets';
 import { DataInputPanel } from './DataInputPanel';
-import { calculateScenario, OriginalMetrics } from '@/lib/scenarioCalculations';
-
-export interface ScenarioAdjustments {
-  revenue: number;
-  orders: number;
-  aov: number;
-  marketingSpend: number;
-  shippingCost: number;
-  cogsPercent: number;
-  operatingExpenses: number;
-}
+import { calculateScenario, OriginalMetrics, ChannelMetrics, sumChannels, ScenarioAdjustments } from '@/lib/scenarioCalculations';
 
 export function ScenarioPlanner() {
   const [adjustments, setAdjustments] = useState<ScenarioAdjustments>({
-    revenue: 0,
-    orders: 0,
-    aov: 0,
-    marketingSpend: 0,
+    revenue: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
+    orders: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
+    aov: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
+    marketingSpend: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
     shippingCost: 0,
-    cogsPercent: 0,
-    operatingExpenses: 0
+    cogsPercent: 0
   });
 
   const [viewMode, setViewMode] = useState<'side-by-side' | 'overlay' | 'delta'>('side-by-side');
   const [isDataPanelOpen, setIsDataPanelOpen] = useState(true);
 
   const [original, setOriginal] = useState<OriginalMetrics>({
-    revenue: 4000000,
-    spend: 2000000,
-    orders: 100000,
-    aov: 40,
+    revenue: { paid: 2000000, organic: 800000, crm: 400000, socialPaid: 300000, tiktok: 200000, affiliate: 300000 },
+    spend: { paid: 1000000, organic: 200000, crm: 100000, socialPaid: 200000, tiktok: 150000, affiliate: 350000 },
+    orders: { paid: 50000, organic: 20000, crm: 10000, socialPaid: 8000, tiktok: 6000, affiliate: 6000 },
+    aov: { paid: 40, organic: 40, crm: 40, socialPaid: 37.5, tiktok: 33.33, affiliate: 50 },
     shippingCost: 100000,
-    cogsPercent: 12,
-    opex: 200000
+    cogsPercent: 12
   });
 
   const adjusted = calculateScenario(original, adjustments);
 
-  const handleAdjustmentChange = (metric: keyof ScenarioAdjustments, value: number) => {
+  const handleAdjustmentChange = (metric: keyof ScenarioAdjustments, value: number | ChannelMetrics) => {
     setAdjustments(prev => ({
       ...prev,
       [metric]: value
@@ -56,13 +45,12 @@ export function ScenarioPlanner() {
 
   const resetAll = () => {
     setAdjustments({
-      revenue: 0,
-      orders: 0,
-      aov: 0,
-      marketingSpend: 0,
+      revenue: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
+      orders: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
+      aov: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
+      marketingSpend: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
       shippingCost: 0,
-      cogsPercent: 0,
-      operatingExpenses: 0
+      cogsPercent: 0
     });
   };
 
@@ -70,7 +58,19 @@ export function ScenarioPlanner() {
     setOriginal(newData);
   };
 
-  const profitImpact = adjusted.netProfit - (original.revenue - original.revenue * (original.cogsPercent / 100) - original.shippingCost - original.spend - original.opex);
+  const originalTotalRevenue = sumChannels(original.revenue);
+  const originalTotalSpend = sumChannels(original.spend);
+  const originalNetProfit = originalTotalRevenue - (originalTotalRevenue * (original.cogsPercent / 100)) - original.shippingCost - originalTotalSpend;
+  const profitImpact = adjusted.netProfit - originalNetProfit;
+
+  // Helper functions to safely handle division
+  const safeDivide = (numerator: number, denominator: number, fallback: number = 0) => {
+    return denominator !== 0 ? numerator / denominator : fallback;
+  };
+
+  const safePercentage = (numerator: number, denominator: number, fallback: number = 0) => {
+    return denominator !== 0 ? (numerator / denominator) * 100 : fallback;
+  };
 
   return (
     <div className="min-h-screen">
@@ -164,32 +164,33 @@ export function ScenarioPlanner() {
               </h2>
 
               <div className="space-y-6">
-                <MetricSlider
-                  label="Revenue (Manual)"
+                <ChannelSlider
+                  label="Revenue by Channel"
                   value={adjustments.revenue}
-                  onChange={(value: number) => handleAdjustmentChange('revenue', value)}
+                  onChange={(value: ChannelMetrics) => handleAdjustmentChange('revenue', value)}
                   icon="📈"
-                  subtitle="Additional revenue beyond orders × AOV"
+                  subtitle="Adjust revenue by marketing channel"
                 />
-                <MetricSlider
-                  label="Orders"
+                <ChannelSlider
+                  label="Orders by Channel"
                   value={adjustments.orders}
-                  onChange={(value: number) => handleAdjustmentChange('orders', value)}
+                  onChange={(value: ChannelMetrics) => handleAdjustmentChange('orders', value)}
                   icon="📦"
-                  subtitle="Affects revenue automatically"
+                  subtitle="Adjust orders by marketing channel"
                 />
-                <MetricSlider
-                  label="Average Order Value"
+                <ChannelSlider
+                  label="Average Order Value by Channel"
                   value={adjustments.aov}
-                  onChange={(value: number) => handleAdjustmentChange('aov', value)}
+                  onChange={(value: ChannelMetrics) => handleAdjustmentChange('aov', value)}
                   icon="💰"
-                  subtitle="Affects revenue automatically"
+                  subtitle="Adjust AOV by marketing channel"
                 />
-                <MetricSlider
-                  label="Marketing Spend"
+                <ChannelSlider
+                  label="Marketing Spend by Channel"
                   value={adjustments.marketingSpend}
-                  onChange={(value: number) => handleAdjustmentChange('marketingSpend', value)}
+                  onChange={(value: ChannelMetrics) => handleAdjustmentChange('marketingSpend', value)}
                   icon="📢"
+                  subtitle="Adjust marketing spend by channel"
                 />
                 <MetricSlider
                   label="Shipping Cost"
@@ -205,21 +206,17 @@ export function ScenarioPlanner() {
                   icon="🏭"
                   subtitle="Cost of goods as % of revenue"
                 />
-                <MetricSlider
-                  label="Operating Expenses"
-                  value={adjustments.operatingExpenses}
-                  onChange={(value: number) => handleAdjustmentChange('operatingExpenses', value)}
-                  icon="🏢"
-                />
+
               </div>
 
               {/* Revenue Correlation Info */}
               <div className="mt-6 pt-4 border-t border-gray-100">
                 <div className="text-xs text-gray-500 mb-2">📊 Revenue Calculation:</div>
                 <div className="text-xs text-gray-600 space-y-1">
-                  <div>Base: {original.orders.toLocaleString()} orders × €{original.aov} AOV = €{(original.orders * original.aov).toLocaleString()}</div>
-                  <div>Adjusted: {adjusted.orders.toLocaleString()} orders × €{adjusted.aov.toFixed(2)} AOV = €{(adjusted.orders * adjusted.aov).toLocaleString()}</div>
-                  <div className="text-blue-600 font-medium">Total Revenue: €{adjusted.revenue.toLocaleString()}</div>
+                  <div>Base: {sumChannels(original.orders).toLocaleString()} orders × €{(sumChannels(original.aov) / 6).toFixed(2)} avg AOV = €{(sumChannels(original.orders) * (sumChannels(original.aov) / 6)).toLocaleString()}</div>
+                  <div>Adjusted: {sumChannels(adjusted.orders).toLocaleString()} orders × €{(sumChannels(adjusted.aov) / 6).toFixed(2)} avg AOV = €{(sumChannels(adjusted.orders) * (sumChannels(adjusted.aov) / 6)).toLocaleString()}</div>
+                  <div>Revenue Multiplier: {((sumChannels(adjusted.orders) * (sumChannels(adjusted.aov) / 6)) / (sumChannels(original.orders) * (sumChannels(original.aov) / 6))).toFixed(2)}x</div>
+                  <div className="text-blue-600 font-medium">Total Revenue: €{sumChannels(adjusted.revenue).toLocaleString()}</div>
                 </div>
               </div>
 
@@ -230,7 +227,7 @@ export function ScenarioPlanner() {
                   <div className={`text-2xl font-bold ${
                     profitImpact >= 0 ? 'text-green-600' : 'text-red-600'
                   }`}>
-                    {profitImpact >= 0 ? '+' : ''}€{Math.abs(profitImpact).toLocaleString()}
+                    {profitImpact >= 0 ? '+' : ''}€{Math.round(Math.abs(profitImpact)).toLocaleString()}
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
                     {profitImpact >= 0 ? 'Increase' : 'Decrease'} in net profit
@@ -245,30 +242,30 @@ export function ScenarioPlanner() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <MetricCard
                 title="📈 Revenue"
-                originalValue={original.revenue}
-                adjustedValue={adjusted.revenue}
+                originalValue={sumChannels(original.revenue)}
+                adjustedValue={sumChannels(adjusted.revenue)}
                 format="currency"
                 viewMode={viewMode}
               />
               <MetricCard
                 title="💳 Marketing Performance"
-                originalValue={original.revenue / original.spend}
-                adjustedValue={adjusted.roas}
+                originalValue={safeDivide(sumChannels(original.revenue), sumChannels(original.spend), 0)}
+                adjustedValue={safeDivide(sumChannels(adjusted.revenue), sumChannels(adjusted.spend), 0)}
                 format="ratio"
                 viewMode={viewMode}
                 subtitle="ROAS"
               />
               <MetricCard
                 title="📊 Cost per Acquisition"
-                originalValue={original.spend / original.orders}
-                adjustedValue={adjusted.cpa}
+                originalValue={safeDivide(sumChannels(original.spend), sumChannels(original.orders), 0)}
+                adjustedValue={safeDivide(sumChannels(adjusted.spend), sumChannels(adjusted.orders), 0)}
                 format="currency"
                 viewMode={viewMode}
                 subtitle="CPA"
               />
               <MetricCard
                 title="💰 Profitability"
-                originalValue={(original.revenue - original.revenue * (original.cogsPercent / 100) - original.shippingCost - original.spend - original.opex) / original.revenue * 100}
+                originalValue={safePercentage(originalNetProfit, originalTotalRevenue, 0)}
                 adjustedValue={adjusted.netProfitMargin}
                 format="percentage"
                 viewMode={viewMode}
@@ -276,17 +273,25 @@ export function ScenarioPlanner() {
               />
               <MetricCard
                 title="📦 Gross Margin"
-                originalValue={(original.revenue - original.revenue * (original.cogsPercent / 100)) / original.revenue * 100}
+                originalValue={safePercentage(originalTotalRevenue - originalTotalRevenue * (original.cogsPercent / 100), originalTotalRevenue, 0)}
                 adjustedValue={adjusted.grossMargin}
                 format="percentage"
                 viewMode={viewMode}
               />
               <MetricCard
                 title="💵 Net Profit"
-                originalValue={original.revenue - original.revenue * (original.cogsPercent / 100) - original.shippingCost - original.spend - original.opex}
+                originalValue={originalNetProfit}
                 adjustedValue={adjusted.netProfit}
                 format="currency"
                 viewMode={viewMode}
+              />
+              <MetricCard
+                title="📢 Marketing Cost %"
+                originalValue={safePercentage(sumChannels(original.spend), sumChannels(original.revenue), 0)}
+                adjustedValue={adjusted.marketingCostPercent}
+                format="percentage"
+                viewMode={viewMode}
+                subtitle="of Revenue"
               />
             </div>
           </div>

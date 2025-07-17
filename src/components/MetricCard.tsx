@@ -24,6 +24,10 @@ export function MetricCard({
         if (title.includes('Revenue') || title.includes('Net Profit')) {
           return `€${Math.round(value).toLocaleString()}`;
         }
+        // Show 2 decimal places for CPA (Cost per Acquisition)
+        if (title.includes('Cost per Acquisition')) {
+          return `€${value.toFixed(2)}`;
+        }
         return `€${value.toLocaleString()}`;
       case 'percentage':
         return `${value.toFixed(2)}%`;

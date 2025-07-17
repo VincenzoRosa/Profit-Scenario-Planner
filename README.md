@@ -1,36 +1,148 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ProfitMax - Dynamic tROAS Optimization App
 
-## Getting Started
+A comprehensive E-commerce profitability application that dynamically calculates optimal target ROAS (Return on Ad Spend) for SEA campaigns based on overall business performance.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### Core Functionality
+- **Dynamic tROAS Calculation**: Automatically recommends optimal tROAS based on business health metrics
+- **Business Health Scoring**: Multi-factor analysis including revenue growth, margins, cash reserves, and inventory turnover
+- **Scenario Planning**: Conservative, Balanced, and Aggressive tROAS strategies
+- **Real-time Visualizations**: Interactive charts and matrices showing optimization opportunities
+
+### Key Components
+
+#### 1. Business Health Inputs (Left Panel)
+- Total Monthly Revenue
+- Month-over-Month Revenue Growth
+- Gross Margin Percentage
+- Operating Expense Ratio
+- Cash Reserve Ratio
+- Inventory Turnover Rate
+- Current SEA Campaign Metrics
+- Business Context (Season, Competition, Stage)
+
+#### 2. tROAS Opportunity Matrix (Center)
+- Heat map visualization showing recommended tROAS zones
+- Color-coded regions: Green (Aggressive), Yellow (Balanced), Red (Conservative)
+- Current position marker with historical path
+- Real-time updates based on business metrics
+
+#### 3. Profit Impact Simulator (Center)
+- Profit curves for current, improved (+10%), and declined (-10%) business scenarios
+- Safe to expand vs. risky territory zones
+- Current vs. recommended tROAS comparison
+
+#### 4. Strategy Dashboard (Right Panel)
+- Recommended tROAS with reasoning
+- Projected impact on spend, revenue, and profit
+- Market opportunity scoring
+- Action buttons for implementation
+
+#### 5. Supporting Visualizations
+- **tROAS Efficiency Curve**: Shows revenue efficiency at different tROAS levels
+- **Business Health Gauge**: Speedometer-style health score visualization
+- **Risk/Reward Matrix**: Scatter plot of tROAS options
+
+#### 6. Smart Alerts System
+- Automated optimization opportunities
+- Margin compression warnings
+- Market opportunity alerts
+- Historical performance tracking
+
+## 🛠️ Technology Stack
+
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Styling**: Tailwind CSS 4
+- **Charts**: Custom SVG visualizations
+- **UI Components**: Radix UI primitives
+- **Icons**: Lucide React
+
+## 📊 Calculation Logic
+
+### Business Health Score (0-100)
+```
+health_score = (
+  revenue_growth_score * 0.3 +
+  profit_margin_score * 0.3 +
+  cash_reserve_score * 0.2 +
+  inventory_turnover_score * 0.2
+)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Base tROAS Calculation
+- **Health Score > 80**: Aggressive (tROAS 2.0)
+- **Health Score > 60**: Balanced (tROAS 3.0)
+- **Health Score > 40**: Conservative (tROAS 4.0)
+- **Health Score ≤ 40**: Defensive (tROAS 5.0)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Context Adjustments
+- **Seasonal**: High season (-0.5), Low season (+0.5)
+- **Competition**: High competition with good health (-0.3)
+- **Growth Stage**: Growth stage with good cash reserves (-0.4)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🚀 Getting Started
 
-## Learn More
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
 
-To learn more about Next.js, take a look at the following resources:
+### Installation
+```bash
+# Clone the repository
+git clone <repository-url>
+cd profitmax
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Install dependencies
+npm install
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Start development server
+npm run dev
+```
 
-## Deploy on Vercel
+### Build for Production
+```bash
+npm run build
+npm start
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📈 Usage
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Input Business Metrics**: Enter your current business performance data in the left panel
+2. **Review Recommendations**: The system will automatically calculate and display recommended tROAS
+3. **Explore Scenarios**: Use the scenario planning toggles to see different approaches
+4. **Analyze Visualizations**: Review the opportunity matrix and profit impact simulator
+5. **Implement Strategy**: Use the action buttons to apply recommended tROAS settings
+
+## 🎯 Key Benefits
+
+- **Data-Driven Decisions**: tROAS recommendations based on comprehensive business analysis
+- **Risk Management**: Visual identification of safe vs. risky tROAS ranges
+- **Market Responsiveness**: Automatic adjustments for seasonal and competitive factors
+- **Profit Optimization**: Maximize profitability while maintaining growth
+- **Historical Tracking**: Monitor performance against recommendations over time
+
+## 🔧 Customization
+
+The application is built with modular components and can be easily customized:
+
+- **Calculation Logic**: Modify `src/lib/calculations.ts` for different algorithms
+- **Visualizations**: Update chart components in `src/components/`
+- **Styling**: Customize Tailwind classes for different themes
+- **Data Sources**: Integrate with external APIs for real-time data
+
+## 📝 License
+
+This project is licensed under the MIT License.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+---
+
+**ProfitMax** - Transforming tROAS from a campaign-level tactic to a strategic business decision.

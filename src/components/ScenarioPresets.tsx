@@ -1,6 +1,6 @@
 'use client';
 
-import { ScenarioAdjustments } from './ScenarioPlanner';
+import { ScenarioAdjustments } from '@/lib/scenarioCalculations';
 
 interface ScenarioPresetsProps {
   onPresetSelect: (preset: ScenarioAdjustments) => void;
@@ -11,13 +11,12 @@ const presets = [
     name: 'Growth Mode',
     description: 'Aggressive revenue growth with increased marketing',
     adjustments: {
-      revenue: 20,
-      orders: 25,
-      aov: 0,
-      marketingSpend: 30,
+      revenue: { paid: 20, organic: 20, crm: 20, socialPaid: 20, tiktok: 20, affiliate: 20 },
+      orders: { paid: 25, organic: 25, crm: 25, socialPaid: 25, tiktok: 25, affiliate: 25 },
+      aov: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
+      marketingSpend: { paid: 30, organic: 30, crm: 30, socialPaid: 30, tiktok: 30, affiliate: 30 },
       shippingCost: 15,
-      cogsPercent: 0,
-      operatingExpenses: 10
+      cogsPercent: 0
     },
     color: 'bg-green-100 text-green-700 border-green-300 hover:bg-green-200'
   },
@@ -25,13 +24,12 @@ const presets = [
     name: 'Efficiency Focus',
     description: 'Optimize costs while maintaining revenue',
     adjustments: {
-      revenue: 0,
-      orders: 0,
-      aov: 0,
-      marketingSpend: -20,
+      revenue: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
+      orders: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
+      aov: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
+      marketingSpend: { paid: -20, organic: -20, crm: -20, socialPaid: -20, tiktok: -20, affiliate: -20 },
       shippingCost: -15,
-      cogsPercent: -10,
-      operatingExpenses: -15
+      cogsPercent: -10
     },
     color: 'bg-blue-100 text-blue-700 border-blue-300 hover:bg-blue-200'
   },
@@ -39,13 +37,12 @@ const presets = [
     name: 'Scale Up',
     description: 'Major expansion with proportional cost increases',
     adjustments: {
-      revenue: 50,
-      orders: 50,
-      aov: 0,
-      marketingSpend: 40,
+      revenue: { paid: 50, organic: 50, crm: 50, socialPaid: 50, tiktok: 50, affiliate: 50 },
+      orders: { paid: 50, organic: 50, crm: 50, socialPaid: 50, tiktok: 50, affiliate: 50 },
+      aov: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
+      marketingSpend: { paid: 40, organic: 40, crm: 40, socialPaid: 40, tiktok: 40, affiliate: 40 },
       shippingCost: 25,
-      cogsPercent: 5,
-      operatingExpenses: 20
+      cogsPercent: 5
     },
     color: 'bg-purple-100 text-purple-700 border-purple-300 hover:bg-purple-200'
   },
@@ -53,13 +50,12 @@ const presets = [
     name: 'Conservative',
     description: 'Cautious approach with minimal changes',
     adjustments: {
-      revenue: 5,
-      orders: 5,
-      aov: 0,
-      marketingSpend: 0,
+      revenue: { paid: 5, organic: 5, crm: 5, socialPaid: 5, tiktok: 5, affiliate: 5 },
+      orders: { paid: 5, organic: 5, crm: 5, socialPaid: 5, tiktok: 5, affiliate: 5 },
+      aov: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
+      marketingSpend: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
       shippingCost: 0,
-      cogsPercent: 0,
-      operatingExpenses: 0
+      cogsPercent: 0
     },
     color: 'bg-yellow-100 text-yellow-700 border-yellow-300 hover:bg-yellow-200'
   }

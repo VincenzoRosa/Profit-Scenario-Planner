@@ -231,7 +231,7 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
               newData.cogsPercent = numValue;
               break;
             case 'operating expenses':
-              newData.opex = numValue;
+              // Operating expenses not currently supported in the data model
               break;
           }
         }

@@ -201,10 +201,28 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
               newData.spend.affiliate = numValue;
               break;
             case 'orders':
-              newData.orders = numValue;
+              // Distribute orders across channels equally
+              const orderPerChannel = numValue / 6;
+              newData.orders = {
+                paid: orderPerChannel,
+                organic: orderPerChannel,
+                crm: orderPerChannel,
+                socialPaid: orderPerChannel,
+                tiktok: orderPerChannel,
+                affiliate: orderPerChannel
+              };
               break;
             case 'average order value':
-              newData.aov = numValue;
+              // Distribute AOV across channels equally
+              const aovPerChannel = numValue / 6;
+              newData.aov = {
+                paid: aovPerChannel,
+                organic: aovPerChannel,
+                crm: aovPerChannel,
+                socialPaid: aovPerChannel,
+                tiktok: aovPerChannel,
+                affiliate: aovPerChannel
+              };
               break;
             case 'shipping cost':
               newData.shippingCost = numValue;

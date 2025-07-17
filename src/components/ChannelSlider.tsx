@@ -10,6 +10,7 @@ interface ChannelSliderProps {
   onChange: (value: ChannelMetrics) => void;
   icon: string;
   subtitle?: string;
+  originalValues?: ChannelMetrics; // Add original values for weighted calculation
 }
 
 const channels = [
@@ -21,7 +22,7 @@ const channels = [
   { key: 'affiliate', label: 'Affiliate', icon: '🤝' }
 ] as const;
 
-export function ChannelSlider({ label, value, onChange, icon, subtitle }: ChannelSliderProps) {
+export function ChannelSlider({ label, value, onChange, icon, subtitle, originalValues }: ChannelSliderProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleChannelChange = (channelKey: keyof ChannelMetrics, newValue: number) => {
@@ -32,8 +33,23 @@ export function ChannelSlider({ label, value, onChange, icon, subtitle }: Channe
   };
 
   const getTotalChange = () => {
-    const total = Object.values(value).reduce((sum, val) => sum + val, 0);
-    return total;
+    if (originalValues) {
+      // Calculate weighted average based on original channel values
+      const totalOriginal = Object.values(originalValues).reduce((sum, val) => sum + val, 0);
+      if (totalOriginal === 0) return 0;
+      
+      const weightedSum = Object.keys(value).reduce((sum, key) => {
+        const channelKey = key as keyof ChannelMetrics;
+        const weight = originalValues[channelKey] / totalOriginal;
+        return sum + (value[channelKey] * weight);
+      }, 0);
+      
+      return Math.round(weightedSum);
+    } else {
+      // Fallback to simple average when original values not provided
+      const total = Object.values(value).reduce((sum, val) => sum + val, 0);
+      return Math.round(total / Object.keys(value).length);
+    }
   };
 
   const getChangeColor = (total: number) => {

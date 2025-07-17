@@ -170,6 +170,7 @@ export function ScenarioPlanner() {
                   onChange={(value: ChannelMetrics) => handleAdjustmentChange('revenue', value)}
                   icon="📈"
                   subtitle="Adjust revenue by marketing channel"
+                  originalValues={original.revenue}
                 />
                 <ChannelSlider
                   label="Orders by Channel"
@@ -177,6 +178,7 @@ export function ScenarioPlanner() {
                   onChange={(value: ChannelMetrics) => handleAdjustmentChange('orders', value)}
                   icon="📦"
                   subtitle="Adjust orders by marketing channel"
+                  originalValues={original.orders}
                 />
                 <ChannelSlider
                   label="Average Order Value by Channel"
@@ -184,6 +186,7 @@ export function ScenarioPlanner() {
                   onChange={(value: ChannelMetrics) => handleAdjustmentChange('aov', value)}
                   icon="💰"
                   subtitle="Adjust AOV by marketing channel"
+                  originalValues={original.aov}
                 />
                 <ChannelSlider
                   label="Marketing Spend by Channel"
@@ -191,6 +194,7 @@ export function ScenarioPlanner() {
                   onChange={(value: ChannelMetrics) => handleAdjustmentChange('marketingSpend', value)}
                   icon="📢"
                   subtitle="Adjust marketing spend by channel"
+                  originalValues={original.spend}
                 />
                 <MetricSlider
                   label="Shipping Cost"

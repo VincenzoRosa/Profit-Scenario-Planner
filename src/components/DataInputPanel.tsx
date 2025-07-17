@@ -212,6 +212,24 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
                 affiliate: orderPerChannel
               };
               break;
+            case 'paid orders':
+              newData.orders.paid = numValue;
+              break;
+            case 'organic orders':
+              newData.orders.organic = numValue;
+              break;
+            case 'crm orders':
+              newData.orders.crm = numValue;
+              break;
+            case 'social paid orders':
+              newData.orders.socialPaid = numValue;
+              break;
+            case 'tiktok orders':
+              newData.orders.tiktok = numValue;
+              break;
+            case 'affiliate orders':
+              newData.orders.affiliate = numValue;
+              break;
             case 'average order value':
               // Distribute AOV across channels equally
               const aovPerChannel = numValue / 6;
@@ -223,6 +241,24 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
                 tiktok: aovPerChannel,
                 affiliate: aovPerChannel
               };
+              break;
+            case 'paid aov':
+              newData.aov.paid = numValue;
+              break;
+            case 'organic aov':
+              newData.aov.organic = numValue;
+              break;
+            case 'crm aov':
+              newData.aov.crm = numValue;
+              break;
+            case 'social paid aov':
+              newData.aov.socialPaid = numValue;
+              break;
+            case 'tiktok aov':
+              newData.aov.tiktok = numValue;
+              break;
+            case 'affiliate aov':
+              newData.aov.affiliate = numValue;
               break;
             case 'shipping cost':
               newData.shippingCost = numValue;

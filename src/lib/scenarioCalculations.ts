@@ -3,7 +3,7 @@ export interface ChannelMetrics {
   organic: number;
   crm: number;
   socialPaid: number;
-  tiktok: number;
+  other: number;
   affiliate: number;
 }
 
@@ -45,7 +45,7 @@ export interface AdjustedMetrics {
 
 // Helper function to sum channel metrics
 export function sumChannels(channels: ChannelMetrics): number {
-  return channels.paid + channels.organic + channels.crm + channels.socialPaid + channels.tiktok + channels.affiliate;
+  return channels.paid + channels.organic + channels.crm + channels.socialPaid + channels.other + channels.affiliate;
 }
 
 // Helper function to apply percentage adjustment to channels
@@ -55,7 +55,7 @@ export function adjustChannels(channels: ChannelMetrics, adjustment: ChannelMetr
     organic: channels.organic * (1 + adjustment.organic / 100),
     crm: channels.crm * (1 + adjustment.crm / 100),
     socialPaid: channels.socialPaid * (1 + adjustment.socialPaid / 100),
-    tiktok: channels.tiktok * (1 + adjustment.tiktok / 100),
+    other: channels.other * (1 + adjustment.other / 100),
     affiliate: channels.affiliate * (1 + adjustment.affiliate / 100)
   };
 }
@@ -81,7 +81,7 @@ export function calculateScenario(original: OriginalMetrics, adjustments: Scenar
     organic: channelAdjustedRevenue.organic * baseRevenueChange,
     crm: channelAdjustedRevenue.crm * baseRevenueChange,
     socialPaid: channelAdjustedRevenue.socialPaid * baseRevenueChange,
-    tiktok: channelAdjustedRevenue.tiktok * baseRevenueChange,
+    other: channelAdjustedRevenue.other * baseRevenueChange,
     affiliate: channelAdjustedRevenue.affiliate * baseRevenueChange
   };
   
@@ -110,7 +110,7 @@ export function calculateScenario(original: OriginalMetrics, adjustments: Scenar
     organic: safeDivide(adjustedRevenue.organic, adjustedSpend.organic, 0),
     crm: safeDivide(adjustedRevenue.crm, adjustedSpend.crm, 0),
     socialPaid: safeDivide(adjustedRevenue.socialPaid, adjustedSpend.socialPaid, 0),
-    tiktok: safeDivide(adjustedRevenue.tiktok, adjustedSpend.tiktok, 0),
+    other: safeDivide(adjustedRevenue.other, adjustedSpend.other, 0),
     affiliate: safeDivide(adjustedRevenue.affiliate, adjustedSpend.affiliate, 0)
   };
 
@@ -119,7 +119,7 @@ export function calculateScenario(original: OriginalMetrics, adjustments: Scenar
     organic: safeDivide(adjustedSpend.organic, totalAdjustedOrders, 0),
     crm: safeDivide(adjustedSpend.crm, totalAdjustedOrders, 0),
     socialPaid: safeDivide(adjustedSpend.socialPaid, totalAdjustedOrders, 0),
-    tiktok: safeDivide(adjustedSpend.tiktok, totalAdjustedOrders, 0),
+    other: safeDivide(adjustedSpend.other, totalAdjustedOrders, 0),
     affiliate: safeDivide(adjustedSpend.affiliate, totalAdjustedOrders, 0)
   };
 

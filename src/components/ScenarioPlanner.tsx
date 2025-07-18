@@ -10,10 +10,10 @@ import { calculateScenario, OriginalMetrics, ChannelMetrics, sumChannels, Scenar
 
 export function ScenarioPlanner() {
   const [adjustments, setAdjustments] = useState<ScenarioAdjustments>({
-    revenue: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
-    orders: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
-    aov: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
-    marketingSpend: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
+    revenue: { paid: 0, organic: 0, crm: 0, socialPaid: 0, other: 0, affiliate: 0 },
+    orders: { paid: 0, organic: 0, crm: 0, socialPaid: 0, other: 0, affiliate: 0 },
+    aov: { paid: 0, organic: 0, crm: 0, socialPaid: 0, other: 0, affiliate: 0 },
+    marketingSpend: { paid: 0, organic: 0, crm: 0, socialPaid: 0, other: 0, affiliate: 0 },
     shippingCost: 0,
     cogsPercent: 0
   });
@@ -22,10 +22,10 @@ export function ScenarioPlanner() {
   const [isDataPanelOpen, setIsDataPanelOpen] = useState(true);
 
   const [original, setOriginal] = useState<OriginalMetrics>({
-    revenue: { paid: 2000000, organic: 800000, crm: 400000, socialPaid: 300000, tiktok: 200000, affiliate: 300000 },
-    spend: { paid: 1000000, organic: 200000, crm: 100000, socialPaid: 200000, tiktok: 150000, affiliate: 350000 },
-    orders: { paid: 50000, organic: 20000, crm: 10000, socialPaid: 8000, tiktok: 6000, affiliate: 6000 },
-    aov: { paid: 40, organic: 40, crm: 40, socialPaid: 37.5, tiktok: 33.33, affiliate: 50 },
+    revenue: { paid: 2000000, organic: 800000, crm: 400000, socialPaid: 300000, other: 200000, affiliate: 300000 },
+    spend: { paid: 1000000, organic: 200000, crm: 100000, socialPaid: 200000, other: 150000, affiliate: 350000 },
+    orders: { paid: 50000, organic: 20000, crm: 10000, socialPaid: 8000, other: 6000, affiliate: 6000 },
+    aov: { paid: 40, organic: 40, crm: 40, socialPaid: 37.5, other: 33.33, affiliate: 50 },
     shippingCost: 100000,
     cogsPercent: 12
   });
@@ -45,10 +45,10 @@ export function ScenarioPlanner() {
 
   const resetAll = () => {
     setAdjustments({
-      revenue: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
-      orders: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
-      aov: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
-      marketingSpend: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
+      revenue: { paid: 0, organic: 0, crm: 0, socialPaid: 0, other: 0, affiliate: 0 },
+      orders: { paid: 0, organic: 0, crm: 0, socialPaid: 0, other: 0, affiliate: 0 },
+      aov: { paid: 0, organic: 0, crm: 0, socialPaid: 0, other: 0, affiliate: 0 },
+      marketingSpend: { paid: 0, organic: 0, crm: 0, socialPaid: 0, other: 0, affiliate: 0 },
       shippingCost: 0,
       cogsPercent: 0
     });

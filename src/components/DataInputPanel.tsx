@@ -58,10 +58,10 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
 
   const handleReset = () => {
     const defaultData: OriginalMetrics = {
-      revenue: { paid: 2000000, organic: 800000, crm: 400000, socialPaid: 300000, tiktok: 200000, affiliate: 300000 },
-      spend: { paid: 1000000, organic: 200000, crm: 100000, socialPaid: 200000, tiktok: 150000, affiliate: 350000 },
-      orders: { paid: 50000, organic: 20000, crm: 10000, socialPaid: 8000, tiktok: 6000, affiliate: 6000 },
-      aov: { paid: 40, organic: 40, crm: 40, socialPaid: 37.5, tiktok: 33.33, affiliate: 50 },
+      revenue: { paid: 2000000, organic: 800000, crm: 400000, socialPaid: 300000, other: 200000, affiliate: 300000 },
+      spend: { paid: 1000000, organic: 200000, crm: 100000, socialPaid: 200000, other: 150000, affiliate: 350000 },
+      orders: { paid: 50000, organic: 20000, crm: 10000, socialPaid: 8000, other: 6000, affiliate: 6000 },
+      aov: { paid: 40, organic: 40, crm: 40, socialPaid: 37.5, other: 33.33, affiliate: 50 },
       shippingCost: 100000,
       cogsPercent: 12
     };
@@ -82,13 +82,13 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
       `Organic Revenue,${originalData.revenue.organic}`,
       `CRM Revenue,${originalData.revenue.crm}`,
       `Social Paid Revenue,${originalData.revenue.socialPaid}`,
-      `TikTok Revenue,${originalData.revenue.tiktok}`,
+      `Other Revenue,${originalData.revenue.other}`,
       `Affiliate Revenue,${originalData.revenue.affiliate}`,
       `Paid Spend,${originalData.spend.paid}`,
       `Organic Spend,${originalData.spend.organic}`,
       `CRM Spend,${originalData.spend.crm}`,
       `Social Paid Spend,${originalData.spend.socialPaid}`,
-      `TikTok Spend,${originalData.spend.tiktok}`,
+      `Other Spend,${originalData.spend.other}`,
       `Affiliate Spend,${originalData.spend.affiliate}`,
       `Total Orders,${sumChannels(originalData.orders)}`,
       `Total AOV,${sumChannels(originalData.aov) / 6}`,
@@ -96,13 +96,13 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
       `Organic Orders,${originalData.orders.organic}`,
       `CRM Orders,${originalData.orders.crm}`,
       `Social Paid Orders,${originalData.orders.socialPaid}`,
-      `TikTok Orders,${originalData.orders.tiktok}`,
+      `Other Orders,${originalData.orders.other}`,
       `Affiliate Orders,${originalData.orders.affiliate}`,
       `Paid AOV,${originalData.aov.paid}`,
       `Organic AOV,${originalData.aov.organic}`,
       `CRM AOV,${originalData.aov.crm}`,
       `Social Paid AOV,${originalData.aov.socialPaid}`,
-      `TikTok AOV,${originalData.aov.tiktok}`,
+      `Other AOV,${originalData.aov.other}`,
       `Affiliate AOV,${originalData.aov.affiliate}`,
       `Shipping Cost,${originalData.shippingCost}`,
       `COGS %,${originalData.cogsPercent}`,
@@ -144,7 +144,7 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
                   organic: newData.revenue.organic * ratio,
                   crm: newData.revenue.crm * ratio,
                   socialPaid: newData.revenue.socialPaid * ratio,
-                  tiktok: newData.revenue.tiktok * ratio,
+                  other: newData.revenue.other * ratio,
                   affiliate: newData.revenue.affiliate * ratio
                 };
               }
@@ -159,7 +159,7 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
                   organic: newData.spend.organic * spendRatio,
                   crm: newData.spend.crm * spendRatio,
                   socialPaid: newData.spend.socialPaid * spendRatio,
-                  tiktok: newData.spend.tiktok * spendRatio,
+                  other: newData.spend.other * spendRatio,
                   affiliate: newData.spend.affiliate * spendRatio
                 };
               }
@@ -176,8 +176,8 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
             case 'social paid revenue':
               newData.revenue.socialPaid = numValue;
               break;
-            case 'tiktok revenue':
-              newData.revenue.tiktok = numValue;
+            case 'other revenue':
+              newData.revenue.other = numValue;
               break;
             case 'affiliate revenue':
               newData.revenue.affiliate = numValue;
@@ -194,8 +194,8 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
             case 'social paid spend':
               newData.spend.socialPaid = numValue;
               break;
-            case 'tiktok spend':
-              newData.spend.tiktok = numValue;
+            case 'other spend':
+              newData.spend.other = numValue;
               break;
             case 'affiliate spend':
               newData.spend.affiliate = numValue;
@@ -208,7 +208,7 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
                 organic: orderPerChannel,
                 crm: orderPerChannel,
                 socialPaid: orderPerChannel,
-                tiktok: orderPerChannel,
+                other: orderPerChannel,
                 affiliate: orderPerChannel
               };
               break;
@@ -224,8 +224,8 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
             case 'social paid orders':
               newData.orders.socialPaid = numValue;
               break;
-            case 'tiktok orders':
-              newData.orders.tiktok = numValue;
+            case 'other orders':
+              newData.orders.other = numValue;
               break;
             case 'affiliate orders':
               newData.orders.affiliate = numValue;
@@ -238,7 +238,7 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
                 organic: aovPerChannel,
                 crm: aovPerChannel,
                 socialPaid: aovPerChannel,
-                tiktok: aovPerChannel,
+                other: aovPerChannel,
                 affiliate: aovPerChannel
               };
               break;
@@ -254,8 +254,8 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
             case 'social paid aov':
               newData.aov.socialPaid = numValue;
               break;
-            case 'tiktok aov':
-              newData.aov.tiktok = numValue;
+            case 'other aov':
+              newData.aov.other = numValue;
               break;
             case 'affiliate aov':
               newData.aov.affiliate = numValue;
@@ -416,11 +416,11 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-xs font-medium text-gray-700">TikTok</label>
+                    <label className="block text-xs font-medium text-gray-700">Other</label>
                     <input
                       type="number"
-                      value={localData.revenue.tiktok}
-                      onChange={(e) => handleChannelChange('revenue', 'tiktok', e.target.value)}
+                      value={localData.revenue.other}
+                      onChange={(e) => handleChannelChange('revenue', 'other', e.target.value)}
                       className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="200000"
                     />
@@ -480,11 +480,11 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-xs font-medium text-gray-700">TikTok</label>
+                    <label className="block text-xs font-medium text-gray-700">Other</label>
                     <input
                       type="number"
-                      value={localData.spend.tiktok}
-                      onChange={(e) => handleChannelChange('spend', 'tiktok', e.target.value)}
+                      value={localData.spend.other}
+                      onChange={(e) => handleChannelChange('spend', 'other', e.target.value)}
                       className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="150000"
                     />
@@ -544,11 +544,11 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-xs font-medium text-gray-700">TikTok</label>
+                    <label className="block text-xs font-medium text-gray-700">Other</label>
                     <input
                       type="number"
-                      value={localData.orders.tiktok}
-                      onChange={(e) => handleChannelChange('orders', 'tiktok', e.target.value)}
+                      value={localData.orders.other}
+                      onChange={(e) => handleChannelChange('orders', 'other', e.target.value)}
                       className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="6000"
                     />
@@ -612,11 +612,11 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-xs font-medium text-gray-700">TikTok</label>
+                    <label className="block text-xs font-medium text-gray-700">Other</label>
                     <input
                       type="number"
-                      value={localData.aov.tiktok}
-                      onChange={(e) => handleChannelChange('aov', 'tiktok', e.target.value)}
+                      value={localData.aov.other}
+                      onChange={(e) => handleChannelChange('aov', 'other', e.target.value)}
                       className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="33.33"
                       step="0.01"

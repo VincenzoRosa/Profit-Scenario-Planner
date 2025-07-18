@@ -11,10 +11,10 @@ const presets = [
     name: 'Growth Mode',
     description: 'Aggressive revenue growth with increased marketing',
     adjustments: {
-      revenue: { paid: 20, organic: 20, crm: 20, socialPaid: 20, tiktok: 20, affiliate: 20 },
-      orders: { paid: 25, organic: 25, crm: 25, socialPaid: 25, tiktok: 25, affiliate: 25 },
-      aov: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
-      marketingSpend: { paid: 30, organic: 30, crm: 30, socialPaid: 30, tiktok: 30, affiliate: 30 },
+      revenue: { paid: 20, organic: 20, crm: 20, socialPaid: 20, other: 20, affiliate: 20 },
+      orders: { paid: 25, organic: 25, crm: 25, socialPaid: 25, other: 25, affiliate: 25 },
+      aov: { paid: 0, organic: 0, crm: 0, socialPaid: 0, other: 0, affiliate: 0 },
+      marketingSpend: { paid: 30, organic: 30, crm: 30, socialPaid: 30, other: 30, affiliate: 30 },
       shippingCost: 15,
       cogsPercent: 0
     },
@@ -24,10 +24,10 @@ const presets = [
     name: 'Efficiency Focus',
     description: 'Optimize costs while maintaining revenue',
     adjustments: {
-      revenue: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
-      orders: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
-      aov: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
-      marketingSpend: { paid: -20, organic: -20, crm: -20, socialPaid: -20, tiktok: -20, affiliate: -20 },
+      revenue: { paid: 0, organic: 0, crm: 0, socialPaid: 0, other: 0, affiliate: 0 },
+      orders: { paid: 0, organic: 0, crm: 0, socialPaid: 0, other: 0, affiliate: 0 },
+      aov: { paid: 0, organic: 0, crm: 0, socialPaid: 0, other: 0, affiliate: 0 },
+      marketingSpend: { paid: -20, organic: -20, crm: -20, socialPaid: -20, other: -20, affiliate: -20 },
       shippingCost: -15,
       cogsPercent: -10
     },
@@ -37,10 +37,10 @@ const presets = [
     name: 'Scale Up',
     description: 'Major expansion with proportional cost increases',
     adjustments: {
-      revenue: { paid: 50, organic: 50, crm: 50, socialPaid: 50, tiktok: 50, affiliate: 50 },
-      orders: { paid: 50, organic: 50, crm: 50, socialPaid: 50, tiktok: 50, affiliate: 50 },
-      aov: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
-      marketingSpend: { paid: 40, organic: 40, crm: 40, socialPaid: 40, tiktok: 40, affiliate: 40 },
+      revenue: { paid: 50, organic: 50, crm: 50, socialPaid: 50, other: 50, affiliate: 50 },
+      orders: { paid: 50, organic: 50, crm: 50, socialPaid: 50, other: 50, affiliate: 50 },
+      aov: { paid: 0, organic: 0, crm: 0, socialPaid: 0, other: 0, affiliate: 0 },
+      marketingSpend: { paid: 40, organic: 40, crm: 40, socialPaid: 40, other: 40, affiliate: 40 },
       shippingCost: 25,
       cogsPercent: 5
     },
@@ -50,10 +50,10 @@ const presets = [
     name: 'Conservative',
     description: 'Cautious approach with minimal changes',
     adjustments: {
-      revenue: { paid: 5, organic: 5, crm: 5, socialPaid: 5, tiktok: 5, affiliate: 5 },
-      orders: { paid: 5, organic: 5, crm: 5, socialPaid: 5, tiktok: 5, affiliate: 5 },
-      aov: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
-      marketingSpend: { paid: 0, organic: 0, crm: 0, socialPaid: 0, tiktok: 0, affiliate: 0 },
+      revenue: { paid: 5, organic: 5, crm: 5, socialPaid: 5, other: 5, affiliate: 5 },
+      orders: { paid: 5, organic: 5, crm: 5, socialPaid: 5, other: 5, affiliate: 5 },
+      aov: { paid: 0, organic: 0, crm: 0, socialPaid: 0, other: 0, affiliate: 0 },
+      marketingSpend: { paid: 0, organic: 0, crm: 0, socialPaid: 0, other: 0, affiliate: 0 },
       shippingCost: 0,
       cogsPercent: 0
     },

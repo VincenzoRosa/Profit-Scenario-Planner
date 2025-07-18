@@ -18,7 +18,7 @@ const channels = [
   { key: 'organic', label: 'Organic', icon: '🌱' },
   { key: 'crm', label: 'CRM', icon: '📧' },
   { key: 'socialPaid', label: 'Social Paid', icon: '📱' },
-  { key: 'tiktok', label: 'TikTok', icon: '🎵' },
+  { key: 'other', label: 'Other', icon: '🎵' },
   { key: 'affiliate', label: 'Affiliate', icon: '🤝' }
 ] as const;
 

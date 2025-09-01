@@ -101,7 +101,6 @@ export function ScenarioPlanner() {
               >
                 Reset All
               </button>
-              <ThemeToggle />
               <div className="flex space-x-2">
                 <button
                   onClick={() => setViewMode('side-by-side')}
@@ -134,6 +133,7 @@ export function ScenarioPlanner() {
                   Delta
                 </button>
               </div>
+              <ThemeToggle />
             </div>
           </div>
         </div>

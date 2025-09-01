@@ -78,17 +78,25 @@ export function ScenarioPlanner() {
       {/* Header */}
       <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-lg">€</span>
+          <div className="py-4 lg:py-6">
+            {/* Top row: Logo, title and theme toggle */}
+            <div className="flex justify-between items-start mb-4 lg:mb-0">
+              <div className="flex items-center space-x-3 flex-1 min-w-0">
+                <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-bold text-sm lg:text-lg">€</span>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white leading-tight">E-commerce Profit Scenario Planner v1.2</h1>
+                  <p className="text-xs lg:text-sm text-gray-500 dark:text-gray-400 hidden sm:block">Adjust metrics and see real-time impact on profitability</p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">E-commerce Profit Scenario Planner v1.2</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Adjust metrics and see real-time impact on profitability</p>
+              <div className="flex-shrink-0 ml-4">
+                <ThemeToggle />
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+
+            {/* Desktop layout - single row with all controls */}
+            <div className="hidden lg:flex justify-end items-center space-x-4">
               <button
                 onClick={() => setIsDataPanelOpen(!isDataPanelOpen)}
                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-lg transition-colors"
@@ -133,7 +141,59 @@ export function ScenarioPlanner() {
                   Delta
                 </button>
               </div>
-              <ThemeToggle />
+            </div>
+
+            {/* Mobile layout - stacked rows */}
+            <div className="lg:hidden space-y-3">
+              {/* Action buttons row */}
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                <button
+                  onClick={() => setIsDataPanelOpen(!isDataPanelOpen)}
+                  className="px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-lg transition-colors flex-1"
+                >
+                  {isDataPanelOpen ? 'Hide' : 'Edit Business Data'}
+                </button>
+                <button
+                  onClick={resetAll}
+                  className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors flex-1"
+                >
+                  Reset All
+                </button>
+              </div>
+
+              {/* View mode buttons row */}
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setViewMode('side-by-side')}
+                  className={`px-2 py-2 text-xs font-medium rounded-lg transition-colors flex-1 ${
+                    viewMode === 'side-by-side'
+                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  Side-by-Side
+                </button>
+                <button
+                  onClick={() => setViewMode('overlay')}
+                  className={`px-2 py-2 text-xs font-medium rounded-lg transition-colors flex-1 ${
+                    viewMode === 'overlay'
+                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  Overlay
+                </button>
+                <button
+                  onClick={() => setViewMode('delta')}
+                  className={`px-2 py-2 text-xs font-medium rounded-lg transition-colors flex-1 ${
+                    viewMode === 'delta'
+                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  Delta
+                </button>
+              </div>
             </div>
           </div>
         </div>

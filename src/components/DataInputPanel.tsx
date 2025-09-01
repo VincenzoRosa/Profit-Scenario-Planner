@@ -698,13 +698,13 @@ export function DataInputPanel({ originalData, onDataChange, isOpen, onToggle }:
           <div className="flex items-center justify-end space-x-3 mt-4 pt-4 border-t border-gray-200">
             <button
               onClick={handleReset}
-              className="px-3 py-1 text-xs font-medium text-gray-600 hover:text-gray-700 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+              className="px-3 py-1 text-xs font-medium text-gray-600 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-200 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-md transition-colors"
             >
               Reset to Default
             </button>
             <button
               onClick={handleCancel}
-              className="px-3 py-1 text-xs font-medium text-gray-600 hover:text-gray-700 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+              className="px-3 py-1 text-xs font-medium text-gray-600 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-200 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-md transition-colors"
             >
               Cancel
             </button>
